@@ -3,14 +3,14 @@
 #pragma once
 
 #include "RPG.h"
-#include "GameFramework/GameModeBase.h"
-#include "RPGGameModeBase.generated.h"
+#include "GameFramework/PlayerController.h"
+#include "RPGPlayerController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RPG_API ARPGGameModeBase : public AGameModeBase
+class RPG_API ARPGPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
