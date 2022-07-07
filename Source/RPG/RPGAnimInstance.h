@@ -18,12 +18,16 @@ public:
 	URPGAnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
 	float CurrentPawnSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
 	bool IsInAir;
+
+	UPROPERTY()
+	float RotatorLastTick;
 	
-	
+
 };

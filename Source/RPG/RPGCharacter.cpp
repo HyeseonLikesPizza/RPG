@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RPGCharacter.h"
+#include "RPGAnimInstance.h"
 
 
 // Sets default values
@@ -15,7 +16,7 @@ ARPGCharacter::ARPGCharacter()
 	Camera->SetupAttachment(SpringArm);
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
-	SpringArm->TargetArmLength = 300.0f;
+	SpringArm->TargetArmLength = 600.0f;
 	SpringArm->SetRelativeRotation(FRotator(-15.0f, 0.0f, 0.0f));
 
 
@@ -29,7 +30,7 @@ ARPGCharacter::ARPGCharacter()
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance>
-		SPARROW_ANIM(TEXT("/Game/Blueprints/AnimBlueprint.AnimBlueprint_C"));
+		SPARROW_ANIM(TEXT("/Game/Animations/AnimBlueprint.AnimBlueprint_C"));
 	if (SPARROW_ANIM.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(SPARROW_ANIM.Class);
@@ -37,12 +38,20 @@ ARPGCharacter::ARPGCharacter()
 
 	SetControlMode(0);
 
+	FName BowEmitterSocket(TEXT("BowEmitterSocket"));
+	if (GetMesh()->DoesSocketExist(BowEmitterSocket))
+	{
+		SocketObj = CreateDefaultSubobject<UObject>(TEXT("SocketObject"));
+		
+	}
 }
 
 // Called when the game starts or when spawned
 void ARPGCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+
 	
 }
 
@@ -50,8 +59,8 @@ void ARPGCharacter::SetControlMode(int32 ControlMode)
 {
 	if (ControlMode == 0)
 	{
-		SpringArm->TargetArmLength = 300.0f;
-		SpringArm->SetRelativeRotation(FRotator(-15.0f, 0.0f, 0.0f));
+		SpringArm->TargetArmLength = 600.0f;
+		SpringArm->SetRelativeRotation(FRotator(-45.0f, 0.0f, 0.0f));
 		SpringArm->bUsePawnControlRotation = true;
 		SpringArm->bInheritPitch = true;
 		SpringArm->bInheritRoll = true;
@@ -74,10 +83,14 @@ void ARPGCharacter::Tick(float DeltaTime)
 
 void ARPGCharacter::PostInitializeComponents()
 {
+	Super::PostInitializeComponents();
+
+	Anim = Cast<URPGAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 void ARPGCharacter::PossessedBy(AController * NewController)
 {
+	Super::PossessedBy(NewController);
 }
 
 // Called to bind functionality to input
@@ -89,7 +102,18 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ARPGCharacter::LeftRight);
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ARPGCharacter::LookUp);
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ARPGCharacter::Turn);
+	PlayerInputComponent->BindAxis(TEXT("Sprint"), this, &ARPGCharacter::Sprint);
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ARPGCharacter::Jump);
+
+}
+
+void ARPGCharacter::Fire()
+{
+	if (ProjectileClass)
+	{
+		
+	}
+
 
 }
 
@@ -111,5 +135,9 @@ void ARPGCharacter::LookUp(float NewAxisValue)
 void ARPGCharacter::Turn(float NewAxisValue)
 {
 	AddControllerYawInput(NewAxisValue);
+}
+
+void ARPGCharacter::Sprint(float NewAxisValue)
+{
 }
 

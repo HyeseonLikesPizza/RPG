@@ -6,6 +6,9 @@ URPGAnimInstance::URPGAnimInstance()
 {
 	CurrentPawnSpeed = 0.0f;
 	IsInAir = false;
+	IsSprinting = false;
+
+
 }
 
 void URPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -21,5 +24,8 @@ void URPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			IsInAir = Character->GetMovementComponent()->IsFalling();
 		}
+
+		
+
 	}
 }

@@ -4,6 +4,7 @@
 
 #include "RPG.h"
 #include "GameFramework/Character.h"
+#include "Arrow.h"
 #include "RPGCharacter.generated.h"
 
 UCLASS()
@@ -30,18 +31,33 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION()
+	void Fire();
+
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	USpringArmComponent* SpringArm;
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* Camera;
 
+	UPROPERTY()
+	class URPGAnimInstance* Anim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GamePlay")
+	FVector MuzzleOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<AArrow> ProjectileClass;
+
+	UPROPERTY()
+	UObject *SocketObj;
+
 private:
 	void UpDown(float NewAxisValue);
 	void LeftRight(float NewAxisValue);
 	void LookUp(float NewAxisValue);
 	void Turn(float NewAxisValue);
-
-
+	void Sprint(float NewAxisValue);
+	
 	
 };
