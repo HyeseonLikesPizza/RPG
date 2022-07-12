@@ -17,6 +17,20 @@ class RPG_API URPGAnimInstance : public UAnimInstance
 public:
 	URPGAnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	virtual void NativeBeginPlay() override;
+
+	void SetIKAlphaLeft(float Alpha)
+	{
+		IKAlphaLeft = Alpha;
+	}
+	void SetIKAlphaRight(float Alpha)
+	{
+		IKAlphaRight = Alpha;
+	}
+	void SetHipDisplacement(float num)
+	{
+		HipDisplacement = num;
+	}
 
 
 private:
@@ -26,8 +40,23 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
 	bool IsInAir;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess=true))
+	float YawDelta;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = IKFoot, Meta=(AllowPrivateAccess = true))
+	float IKAlphaLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = IKFoot, Meta = (AllowPrivateAccess = true))
+	float IKAlphaRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = IKFoot, Meta = (AllowPrivateAccess = true))
+	float HipDisplacement;
+
 	UPROPERTY()
-	float RotatorLastTick;
+	FRotator RotatorLastTick;
+
+	UPROPERTY()
+	float Target;
 	
 
 };

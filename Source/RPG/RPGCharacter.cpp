@@ -2,6 +2,8 @@
 
 #include "RPGCharacter.h"
 #include "RPGAnimInstance.h"
+#include "DrawDebugHelpers.h"
+
 
 
 // Sets default values
@@ -18,6 +20,11 @@ ARPGCharacter::ARPGCharacter()
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
 	SpringArm->TargetArmLength = 600.0f;
 	SpringArm->SetRelativeRotation(FRotator(-15.0f, 0.0f, 0.0f));
+
+	LegStart = CreateDefaultSubobject<USphereComponent>(TEXT("Object"));
+	LegStart->SetAllMassScale(0.0f);
+	LegStart->SetRelativeLocation(FVector(9.0f, 0.0f, 0.0f));
+	LegStart->SetupAttachment(GetCapsuleComponent());
 
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
@@ -59,7 +66,7 @@ void ARPGCharacter::SetControlMode(int32 ControlMode)
 {
 	if (ControlMode == 0)
 	{
-		SpringArm->TargetArmLength = 600.0f;
+		SpringArm->TargetArmLength = 300.0f;
 		SpringArm->SetRelativeRotation(FRotator(-45.0f, 0.0f, 0.0f));
 		SpringArm->bUsePawnControlRotation = true;
 		SpringArm->bInheritPitch = true;
@@ -79,6 +86,80 @@ void ARPGCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/*
+	FVector StartLocation = LegStart->GetComponentLocation();
+	FVector DownVec = LegStart->GetUpVector() * -500.0f;
+	FVector EndLocation = StartLocation + DownVec;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	
+	bool IsHitResult = GetWorld()->LineTraceSingleByObjectType(
+		HitResult,
+		StartLocation,
+		EndLocation,
+		ECC_WorldStatic,
+		Params
+	);
+
+	const float DebugLifeTime = 3.0f;
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, DebugLifeTime);
+
+	if (IsHitResult)
+	{
+	
+	}
+	*/
+
+	// Leg IK - Slope (Right Leg)
+
+	FVector RightFootLocation(GetMesh()->GetSocketLocation(FName("foot_r")).X,
+		GetMesh()->GetSocketLocation(FName("foot_r")).Y,
+		GetActorLocation().Z - 95.0f);
+
+	FHitResult RHitResult;
+	FCollisionQueryParams Params(NAME_None, false, this);
+
+	if (GetWorld()->LineTraceSingleByChannel(
+		RHitResult,
+		RightFootLocation + FVector(0.0f, 0.0f, 100.0f),
+		RightFootLocation - FVector(0.0f, 0.0f, 100.0f),
+		ECC_Camera,
+		Params))
+	{
+		Anim->SetIKAlphaRight(((RHitResult.Location - RightFootLocation)).Z / 30.0f);
+	}
+
+	const float DebugLifeTime = 3.0f;
+
+	//DrawDebugLine(GetWorld(), RightFootLocation,
+	//	RightFootLocation - FVector(0.0f, 0.0f, 100.0f), FColor::Red, false, DebugLifeTime);
+
+	// Leg IK - Slpe (Left Leg)
+
+	FHitResult LHitResult;
+
+	FVector LeftFootLocation(GetMesh()->GetSocketLocation(FName("foot_l")).X,
+		GetMesh()->GetSocketLocation(FName("foot_l")).Y,
+		GetActorLocation().Z - 95.0f);
+
+	if (GetWorld()->LineTraceSingleByChannel(
+		LHitResult,
+		LeftFootLocation + FVector(0.0f, 0.0f, 100.0f),
+		LeftFootLocation - FVector(0.0f, 0.0f, 100.0f),
+		ECC_Camera,
+		Params))
+	{
+		Anim->SetIKAlphaLeft(((LHitResult.Location - LeftFootLocation)).Z / 30.0f);
+	}
+
+	//DrawDebugLine(GetWorld(), LeftFootLocation,
+	//	LeftFootLocation - FVector(0.0f, 0.0f, 100.0f), FColor::Red, false, DebugLifeTime);
+
+
+	Anim->SetHipDisplacement(-0.5f*abs(RHitResult.Location.Z - LHitResult.Location.Z));
+
+	
 }
 
 void ARPGCharacter::PostInitializeComponents()

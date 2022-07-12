@@ -50,6 +50,10 @@ public:
 	TSubclassOf<AArrow> ProjectileClass;
 
 	UPROPERTY()
+	USphereComponent* LegStart;
+	
+
+	UPROPERTY()
 	UObject *SocketObj;
 
 private:
